@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plus, Search, Edit, Trash2, Phone, Mail } from "lucide-react";
+import { Plus, Search, Edit, Trash2, Phone, Mail, Eye, EyeOff } from "lucide-react";
 
 interface Client {
   id: number;
@@ -15,10 +15,15 @@ interface Client {
   address: string;
   type: string;
   status: string;
+  dgiLogin: string;
+  dgiPassword: string;
+  damancomLogin: string;
+  damancomPassword: string;
 }
 
 export function ClientManagement() {
   const [searchTerm, setSearchTerm] = useState("");
+  const [visiblePasswords, setVisiblePasswords] = useState<{[key: string]: boolean}>({});
   const [clients] = useState<Client[]>([
     {
       id: 1,
@@ -28,7 +33,11 @@ export function ClientManagement() {
       phone: "0661234567",
       address: "Casablanca, Maroc",
       type: "SARL",
-      status: "Actif"
+      status: "Actif",
+      dgiLogin: "ahmed_abc_2024",
+      dgiPassword: "DGI@2024!ABC",
+      damancomLogin: "abc_sarl_dm",
+      damancomPassword: "Damancom@123"
     },
     {
       id: 2,
@@ -38,7 +47,11 @@ export function ClientManagement() {
       phone: "0662345678",
       address: "Rabat, Maroc",
       type: "Auto-entrepreneur",
-      status: "Actif"
+      status: "Actif",
+      dgiLogin: "fatima_fashion",
+      dgiPassword: "Fashion2024#",
+      damancomLogin: "boutique_fm",
+      damancomPassword: "DM_Fashion@2024"
     },
     {
       id: 3,
@@ -48,7 +61,11 @@ export function ClientManagement() {
       phone: "0663456789",
       address: "Marrakech, Maroc",
       type: "SA",
-      status: "En attente"
+      status: "En attente",
+      dgiLogin: "construc_pro_mt",
+      dgiPassword: "ConstrDGI@2024",
+      damancomLogin: "construction_dm",
+      damancomPassword: "ProConstruct@123"
     }
   ]);
 
@@ -56,6 +73,35 @@ export function ClientManagement() {
     client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     client.company.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const togglePasswordVisibility = (clientId: number, field: string) => {
+    const key = `${clientId}-${field}`;
+    setVisiblePasswords(prev => ({
+      ...prev,
+      [key]: !prev[key]
+    }));
+  };
+
+  const renderPasswordField = (clientId: number, password: string, field: string) => {
+    const key = `${clientId}-${field}`;
+    const isVisible = visiblePasswords[key];
+    
+    return (
+      <div className="flex items-center gap-2">
+        <span className="text-sm font-mono">
+          {isVisible ? password : '••••••••'}
+        </span>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => togglePasswordVisibility(clientId, field)}
+          className="h-6 w-6 p-0"
+        >
+          {isVisible ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
+        </Button>
+      </div>
+    );
+  };
 
   return (
     <div className="space-y-6">
@@ -85,62 +131,90 @@ export function ClientManagement() {
           </div>
         </div>
 
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Nom</TableHead>
-              <TableHead>Société</TableHead>
-              <TableHead>Contact</TableHead>
-              <TableHead>Type</TableHead>
-              <TableHead>Statut</TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredClients.map((client) => (
-              <TableRow key={client.id}>
-                <TableCell className="font-medium">{client.name}</TableCell>
-                <TableCell>{client.company}</TableCell>
-                <TableCell>
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-1 text-sm">
-                      <Mail className="h-3 w-3" />
-                      {client.email}
-                    </div>
-                    <div className="flex items-center gap-1 text-sm">
-                      <Phone className="h-3 w-3" />
-                      {client.phone}
-                    </div>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">
-                    {client.type}
-                  </span>
-                </TableCell>
-                <TableCell>
-                  <span className={`px-2 py-1 rounded-full text-xs ${
-                    client.status === 'Actif' 
-                      ? 'bg-green-100 text-green-800' 
-                      : 'bg-yellow-100 text-yellow-800'
-                  }`}>
-                    {client.status}
-                  </span>
-                </TableCell>
-                <TableCell>
-                  <div className="flex gap-2">
-                    <Button variant="outline" size="sm">
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                    <Button variant="outline" size="sm">
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </TableCell>
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Nom</TableHead>
+                <TableHead>Société</TableHead>
+                <TableHead>Contact</TableHead>
+                <TableHead>Type</TableHead>
+                <TableHead>Statut</TableHead>
+                <TableHead>DGI</TableHead>
+                <TableHead>DAMANCOM</TableHead>
+                <TableHead>Actions</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {filteredClients.map((client) => (
+                <TableRow key={client.id}>
+                  <TableCell className="font-medium">{client.name}</TableCell>
+                  <TableCell>{client.company}</TableCell>
+                  <TableCell>
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-1 text-sm">
+                        <Mail className="h-3 w-3" />
+                        {client.email}
+                      </div>
+                      <div className="flex items-center gap-1 text-sm">
+                        <Phone className="h-3 w-3" />
+                        {client.phone}
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">
+                      {client.type}
+                    </span>
+                  </TableCell>
+                  <TableCell>
+                    <span className={`px-2 py-1 rounded-full text-xs ${
+                      client.status === 'Actif' 
+                        ? 'bg-green-100 text-green-800' 
+                        : 'bg-yellow-100 text-yellow-800'
+                    }`}>
+                      {client.status}
+                    </span>
+                  </TableCell>
+                  <TableCell>
+                    <div className="space-y-2 min-w-[150px]">
+                      <div>
+                        <div className="text-xs text-muted-foreground mb-1">Login:</div>
+                        <div className="text-sm font-mono">{client.dgiLogin}</div>
+                      </div>
+                      <div>
+                        <div className="text-xs text-muted-foreground mb-1">Mot de passe:</div>
+                        {renderPasswordField(client.id, client.dgiPassword, 'dgi')}
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="space-y-2 min-w-[150px]">
+                      <div>
+                        <div className="text-xs text-muted-foreground mb-1">Login:</div>
+                        <div className="text-sm font-mono">{client.damancomLogin}</div>
+                      </div>
+                      <div>
+                        <div className="text-xs text-muted-foreground mb-1">Mot de passe:</div>
+                        {renderPasswordField(client.id, client.damancomPassword, 'damancom')}
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex gap-2">
+                      <Button variant="outline" size="sm">
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button variant="outline" size="sm">
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       </Card>
     </div>
   );
