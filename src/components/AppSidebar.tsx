@@ -1,5 +1,5 @@
 
-import { Users, Calendar, FileText, BarChart3, MapPin } from "lucide-react";
+import { Users, Calendar, FileText, BarChart3, MapPin, Settings, CalendarDays } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -37,6 +37,16 @@ const menuItems = [
     title: "Facturation",
     id: "invoices",
     icon: FileText,
+  },
+  {
+    title: "Calendrier Fiscal",
+    id: "calendrier-fiscal",
+    icon: CalendarDays,
+  },
+  {
+    title: "Paramètres",
+    id: "parametres",
+    icon: Settings,
   },
 ];
 

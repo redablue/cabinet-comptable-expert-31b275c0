@@ -6,6 +6,8 @@ import { ClientManagement } from "@/components/ClientManagement";
 import { TaskManagement } from "@/components/TaskManagement";
 import { InvoiceManagement } from "@/components/InvoiceManagement";
 import { Dashboard } from "@/components/Dashboard";
+import { CalendrierFiscal } from "@/components/CalendrierFiscal";
+import { Parametres } from "@/components/Parametres";
 
 const Index = () => {
   const [activeSection, setActiveSection] = useState("dashboard");
@@ -20,6 +22,10 @@ const Index = () => {
         return <TaskManagement />;
       case "invoices":
         return <InvoiceManagement />;
+      case "calendrier-fiscal":
+        return <CalendrierFiscal />;
+      case "parametres":
+        return <Parametres />;
       default:
         return <Dashboard />;
     }
