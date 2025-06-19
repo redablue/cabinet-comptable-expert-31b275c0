@@ -1,0 +1,99 @@
+
+import { Card } from "@/components/ui/card";
+import { Users, FileText, Clock, DollarSign } from "lucide-react";
+
+export function Dashboard() {
+  const stats = [
+    {
+      title: "Clients Actifs",
+      value: "127",
+      icon: Users,
+      color: "bg-blue-500",
+    },
+    {
+      title: "Factures ce mois",
+      value: "45",
+      icon: FileText,
+      color: "bg-green-500",
+    },
+    {
+      title: "Tâches en cours",
+      value: "23",
+      icon: Clock,
+      color: "bg-orange-500",
+    },
+    {
+      title: "Chiffre d'affaires",
+      value: "125,430 MAD",
+      icon: DollarSign,
+      color: "bg-purple-500",
+    },
+  ];
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-2xl font-bold mb-2">Tableau de Bord</h2>
+        <p className="text-muted-foreground">
+          Vue d'ensemble de votre cabinet comptable
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {stats.map((stat, index) => (
+          <Card key={index} className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">
+                  {stat.title}
+                </p>
+                <p className="text-2xl font-bold">{stat.value}</p>
+              </div>
+              <div className={`p-3 rounded-full ${stat.color}`}>
+                <stat.icon className="h-6 w-6 text-white" />
+              </div>
+            </div>
+          </Card>
+        ))}
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card className="p-6">
+          <h3 className="text-lg font-semibold mb-4">Activités Récentes</h3>
+          <div className="space-y-3">
+            <div className="flex justify-between items-center p-3 bg-muted/50 rounded">
+              <span>Nouvelle facture créée pour Client ABC</span>
+              <span className="text-sm text-muted-foreground">Il y a 2h</span>
+            </div>
+            <div className="flex justify-between items-center p-3 bg-muted/50 rounded">
+              <span>Tâche assignée à Mohamed Alami</span>
+              <span className="text-sm text-muted-foreground">Il y a 4h</span>
+            </div>
+            <div className="flex justify-between items-center p-3 bg-muted/50 rounded">
+              <span>Nouveau client ajouté: Société XYZ</span>
+              <span className="text-sm text-muted-foreground">Hier</span>
+            </div>
+          </div>
+        </Card>
+
+        <Card className="p-6">
+          <h3 className="text-lg font-semibold mb-4">Tâches Urgentes</h3>
+          <div className="space-y-3">
+            <div className="flex justify-between items-center p-3 bg-red-50 border border-red-200 rounded">
+              <span>Déclaration TVA - Société ABC</span>
+              <span className="text-sm text-red-600 font-medium">Urgent</span>
+            </div>
+            <div className="flex justify-between items-center p-3 bg-orange-50 border border-orange-200 rounded">
+              <span>Bilan comptable - Client DEF</span>
+              <span className="text-sm text-orange-600 font-medium">3 jours</span>
+            </div>
+            <div className="flex justify-between items-center p-3 bg-yellow-50 border border-yellow-200 rounded">
+              <span>Révision comptes - GHI SARL</span>
+              <span className="text-sm text-yellow-600 font-medium">1 semaine</span>
+            </div>
+          </div>
+        </Card>
+      </div>
+    </div>
+  );
+}
