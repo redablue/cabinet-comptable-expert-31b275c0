@@ -131,6 +131,14 @@ export type Database = {
         Args: { user_email: string; user_role: string; user_full_name: string }
         Returns: Json
       }
+      create_superadmin_user: {
+        Args: {
+          admin_email: string
+          admin_password: string
+          admin_full_name: string
+        }
+        Returns: Json
+      }
       is_manager_or_higher: {
         Args: Record<PropertyKey, never> | { _user_id: string }
         Returns: boolean
