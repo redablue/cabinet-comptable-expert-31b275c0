@@ -1,5 +1,5 @@
 
-import { Users, Calendar, FileText, BarChart3, MapPin, Settings, CalendarDays, UserCheck, LogOut } from "lucide-react";
+import { Users, Calendar, FileText, BarChart3, MapPin, Settings, CalendarDays, UserCheck, LogOut, File, Key } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -45,6 +45,18 @@ const menuItems = [
     id: "invoices",
     icon: FileText,
     roles: ['superadmin', 'admin', 'employee'],
+  },
+  {
+    title: "Gestion Documents",
+    id: "documents",
+    icon: File,
+    roles: ['superadmin', 'admin', 'employee'],
+  },
+  {
+    title: "Identifiants DGI/DAMANCOM",
+    id: "identifiants",
+    icon: Key,
+    roles: ['superadmin', 'admin', 'employee', 'trainee'],
   },
   {
     title: "Calendrier Fiscal",
