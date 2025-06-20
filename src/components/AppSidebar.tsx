@@ -1,5 +1,5 @@
 
-import { Users, Calendar, FileText, BarChart3, MapPin, Settings, CalendarDays, UserCheck, LogOut, File, Key } from "lucide-react";
+import { Users, Calendar, FileText, BarChart3, MapPin, Settings, CalendarDays, UserCheck, LogOut, File, ClipboardList, UserPlus } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -35,16 +35,16 @@ const menuItems = [
     roles: ['superadmin', 'admin', 'employee', 'trainee'],
   },
   {
-    title: "Tâches Employés",
+    title: "Gestion des Tâches",
     id: "tasks",
-    icon: Calendar,
+    icon: ClipboardList,
     roles: ['superadmin', 'admin', 'employee'],
   },
   {
-    title: "Facturation",
-    id: "invoices",
-    icon: FileText,
-    roles: ['superadmin', 'admin', 'employee'],
+    title: "Gestion des Employés",
+    id: "employees",
+    icon: UserPlus,
+    roles: ['superadmin', 'admin'],
   },
   {
     title: "Gestion Documents",
@@ -53,10 +53,10 @@ const menuItems = [
     roles: ['superadmin', 'admin', 'employee'],
   },
   {
-    title: "Identifiants DGI/DAMANCOM",
-    id: "identifiants",
-    icon: Key,
-    roles: ['superadmin', 'admin', 'employee', 'trainee'],
+    title: "Facturation",
+    id: "invoices",
+    icon: FileText,
+    roles: ['superadmin', 'admin', 'employee'],
   },
   {
     title: "Calendrier Fiscal",

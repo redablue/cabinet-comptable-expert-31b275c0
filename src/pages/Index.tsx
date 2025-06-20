@@ -5,12 +5,13 @@ import { AppSidebar } from "@/components/AppSidebar";
 import { Dashboard } from "@/components/Dashboard";
 import { ClientManagement } from "@/components/ClientManagement";
 import { TaskManagement } from "@/components/TaskManagement";
+import { TasksManagement } from "@/components/TasksManagement";
+import { EmployeeManagement } from "@/components/EmployeeManagement";
 import { InvoiceManagement } from "@/components/InvoiceManagement";
 import { CalendrierFiscal } from "@/components/CalendrierFiscal";
 import { Parametres } from "@/components/Parametres";
 import { UserManagement } from "@/components/UserManagement";
 import { DocumentManagement } from "@/components/DocumentManagement";
-import { IdentifiantsManagement } from "@/components/IdentifiantsManagement";
 import { useAuth } from "@/hooks/useAuth";
 
 const Index = () => {
@@ -24,13 +25,13 @@ const Index = () => {
       case "clients":
         return <ClientManagement />;
       case "tasks":
-        return <TaskManagement />;
+        return <TasksManagement />;
+      case "employees":
+        return <EmployeeManagement />;
       case "invoices":
         return <InvoiceManagement />;
       case "documents":
         return <DocumentManagement />;
-      case "identifiants":
-        return <IdentifiantsManagement />;
       case "calendrier-fiscal":
         return <CalendrierFiscal />;
       case "users":
