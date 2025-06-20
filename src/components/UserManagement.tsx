@@ -8,49 +8,51 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
-import { Switch } from '@/components/ui/switch';
-import { Plus, Users, Shield, UserCheck, UserX } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Plus, Users, Shield, UserCheck, UserX, AlertCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 
-interface AuthorizedUser {
+interface UserProfile {
   id: string;
   email: string;
+  full_name: string;
   role: string;
-  is_active: boolean;
   created_at: string;
+  phone?: string;
 }
 
 export function UserManagement() {
-  const [authorizedUsers, setAuthorizedUsers] = useState<AuthorizedUser[]>([]);
+  const [userProfiles, setUserProfiles] = useState<UserProfile[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [newUserEmail, setNewUserEmail] = useState('');
+  const [newUserFullName, setNewUserFullName] = useState('');
   const [newUserRole, setNewUserRole] = useState<string>('assistant');
   const [loading, setLoading] = useState(false);
   const { userRole } = useAuth();
   const { toast } = useToast();
 
   useEffect(() => {
-    fetchAuthorizedUsers();
+    fetchUserProfiles();
   }, []);
 
-  const fetchAuthorizedUsers = async () => {
+  const fetchUserProfiles = async () => {
     const { data, error } = await supabase
-      .from('authorized_users')
+      .from('profiles')
       .select('*')
       .order('created_at', { ascending: false });
 
     if (error) {
-      console.error('Error fetching authorized users:', error);
+      console.error('Error fetching user profiles:', error);
       return;
     }
 
-    setAuthorizedUsers(data || []);
+    setUserProfiles(data || []);
   };
 
-  const addAuthorizedUser = async () => {
-    if (!newUserEmail || !newUserRole) {
+  const createUserProfile = async () => {
+    if (!newUserEmail || !newUserFullName || !newUserRole) {
       toast({
         title: 'Erreur',
         description: 'Veuillez remplir tous les champs',
@@ -60,53 +62,43 @@ export function UserManagement() {
     }
 
     setLoading(true);
-    const { error } = await supabase
-      .from('authorized_users')
-      .insert([
-        {
-          email: newUserEmail,
-          role: newUserRole,
-        },
-      ]);
-
-    if (error) {
-      toast({
-        title: 'Erreur',
-        description: error.message,
-        variant: 'destructive',
+    
+    try {
+      // First create the authorized user entry
+      const { error: authError } = await supabase.rpc('create_authorized_user', {
+        user_email: newUserEmail,
+        user_role: newUserRole,
+        user_full_name: newUserFullName
       });
-    } else {
+
+      if (authError) {
+        toast({
+          title: 'Erreur',
+          description: 'Erreur lors de la création de l\'utilisateur autorisé',
+          variant: 'destructive',
+        });
+        return;
+      }
+
       toast({
         title: 'Succès',
-        description: 'Utilisateur autorisé ajouté avec succès',
+        description: 'Utilisateur créé avec succès. Il peut maintenant s\'inscrire avec cet email.',
       });
+      
       setNewUserEmail('');
+      setNewUserFullName('');
       setNewUserRole('assistant');
       setIsDialogOpen(false);
-      fetchAuthorizedUsers();
-    }
-    setLoading(false);
-  };
-
-  const toggleUserStatus = async (userId: string, currentStatus: boolean) => {
-    const { error } = await supabase
-      .from('authorized_users')
-      .update({ is_active: !currentStatus })
-      .eq('id', userId);
-
-    if (error) {
+      
+    } catch (error) {
       toast({
         title: 'Erreur',
-        description: error.message,
+        description: 'Une erreur est survenue lors de la création',
         variant: 'destructive',
       });
-    } else {
-      toast({
-        title: 'Succès',
-        description: `Utilisateur ${!currentStatus ? 'activé' : 'désactivé'} avec succès`,
-      });
-      fetchAuthorizedUsers();
     }
+    
+    setLoading(false);
   };
 
   const getRoleBadgeColor = (role: string) => {
@@ -147,7 +139,7 @@ export function UserManagement() {
         <div>
           <h2 className="text-2xl font-bold">Gestion des Utilisateurs</h2>
           <p className="text-muted-foreground">
-            Gérez les utilisateurs autorisés à accéder au système
+            Gérez les utilisateurs du système de gestion comptable
           </p>
         </div>
         
@@ -155,14 +147,32 @@ export function UserManagement() {
           <DialogTrigger asChild>
             <Button className="gap-2">
               <Plus className="h-4 w-4" />
-              Ajouter Utilisateur
+              Créer Utilisateur
             </Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Ajouter un Utilisateur Autorisé</DialogTitle>
+              <DialogTitle>Créer un Nouvel Utilisateur</DialogTitle>
             </DialogHeader>
+            
+            <Alert>
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>
+                L'utilisateur recevra ses identifiants par email et pourra se connecter au système.
+              </AlertDescription>
+            </Alert>
+            
             <div className="space-y-4">
+              <div>
+                <Label htmlFor="fullName">Nom Complet</Label>
+                <Input
+                  id="fullName"
+                  value={newUserFullName}
+                  onChange={(e) => setNewUserFullName(e.target.value)}
+                  placeholder="Ahmed Alami"
+                />
+              </div>
+              
               <div>
                 <Label htmlFor="email">Email</Label>
                 <Input
@@ -173,6 +183,7 @@ export function UserManagement() {
                   placeholder="utilisateur@cabinet.ma"
                 />
               </div>
+              
               <div>
                 <Label htmlFor="role">Rôle</Label>
                 <Select value={newUserRole} onValueChange={setNewUserRole}>
@@ -189,8 +200,9 @@ export function UserManagement() {
                   </SelectContent>
                 </Select>
               </div>
-              <Button onClick={addAuthorizedUser} disabled={loading} className="w-full">
-                {loading ? 'Ajout en cours...' : 'Ajouter'}
+              
+              <Button onClick={createUserProfile} disabled={loading} className="w-full">
+                {loading ? 'Création en cours...' : 'Créer Utilisateur'}
               </Button>
             </div>
           </DialogContent>
@@ -201,17 +213,18 @@ export function UserManagement() {
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead>Nom Complet</TableHead>
               <TableHead>Email</TableHead>
               <TableHead>Rôle</TableHead>
-              <TableHead>Statut</TableHead>
-              <TableHead>Date d'ajout</TableHead>
-              <TableHead>Actions</TableHead>
+              <TableHead>Téléphone</TableHead>
+              <TableHead>Date de création</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {authorizedUsers.map((user) => (
+            {userProfiles.map((user) => (
               <TableRow key={user.id}>
-                <TableCell className="font-medium">{user.email}</TableCell>
+                <TableCell className="font-medium">{user.full_name}</TableCell>
+                <TableCell>{user.email}</TableCell>
                 <TableCell>
                   <Badge className={getRoleBadgeColor(user.role)}>
                     <div className="flex items-center gap-1">
@@ -220,32 +233,23 @@ export function UserManagement() {
                     </div>
                   </Badge>
                 </TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-2">
-                    {user.is_active ? (
-                      <UserCheck className="h-4 w-4 text-green-600" />
-                    ) : (
-                      <UserX className="h-4 w-4 text-red-600" />
-                    )}
-                    <span className={user.is_active ? 'text-green-600' : 'text-red-600'}>
-                      {user.is_active ? 'Actif' : 'Inactif'}
-                    </span>
-                  </div>
-                </TableCell>
+                <TableCell>{user.phone || '-'}</TableCell>
                 <TableCell>
                   {new Date(user.created_at).toLocaleDateString('fr-FR')}
-                </TableCell>
-                <TableCell>
-                  <Switch
-                    checked={user.is_active}
-                    onCheckedChange={() => toggleUserStatus(user.id, user.is_active)}
-                  />
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </Card>
+      
+      <Alert>
+        <AlertCircle className="h-4 w-4" />
+        <AlertDescription>
+          <strong>Note :</strong> Seuls les utilisateurs créés par l'administrateur peuvent se connecter au système. 
+          L'inscription libre est désactivée pour des raisons de sécurité.
+        </AlertDescription>
+      </Alert>
     </div>
   );
 }
