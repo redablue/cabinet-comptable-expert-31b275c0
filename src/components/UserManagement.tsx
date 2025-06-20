@@ -64,25 +64,11 @@ export function UserManagement() {
     setLoading(true);
     
     try {
-      // First create the authorized user entry
-      const { error: authError } = await supabase.rpc('create_authorized_user', {
-        user_email: newUserEmail,
-        user_role: newUserRole,
-        user_full_name: newUserFullName
-      });
-
-      if (authError) {
-        toast({
-          title: 'Erreur',
-          description: 'Erreur lors de la création de l\'utilisateur autorisé',
-          variant: 'destructive',
-        });
-        return;
-      }
-
+      // For now, we'll show a message that this feature requires full database setup
       toast({
-        title: 'Succès',
-        description: 'Utilisateur créé avec succès. Il peut maintenant s\'inscrire avec cet email.',
+        title: 'Fonctionnalité en cours de développement',
+        description: 'La création d\'utilisateurs nécessite la configuration complète de la base de données. Contactez votre développeur.',
+        variant: 'destructive',
       });
       
       setNewUserEmail('');
@@ -246,8 +232,8 @@ export function UserManagement() {
       <Alert>
         <AlertCircle className="h-4 w-4" />
         <AlertDescription>
-          <strong>Note :</strong> Seuls les utilisateurs créés par l'administrateur peuvent se connecter au système. 
-          L'inscription libre est désactivée pour des raisons de sécurité.
+          <strong>Note :</strong> La création d'utilisateurs nécessite la configuration complète de la base de données. 
+          Actuellement, vous pouvez voir les utilisateurs existants mais la création nécessite des étapes supplémentaires.
         </AlertDescription>
       </Alert>
     </div>
