@@ -99,7 +99,30 @@ export function AuthPage() {
   const createSuperAdmin = async () => {
     setLoading(true);
     try {
-      // Utiliser la fonction SQL pour créer le superadmin
+      // D'abord créer l'utilisateur dans l'authentification Supabase
+      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+        email: 'admin@cabinet.ma',
+        password: 'AdminCabinet2024!',
+        options: {
+          emailRedirectTo: `${window.location.origin}/`,
+          data: {
+            full_name: 'Administrateur Principal',
+          }
+        }
+      });
+
+      if (signUpError && !signUpError.message.includes('User already registered')) {
+        console.error('Erreur lors de l\'inscription:', signUpError);
+        toast({
+          title: 'Erreur',
+          description: 'Impossible de créer le compte d\'authentification',
+          variant: 'destructive',
+        });
+        setLoading(false);
+        return;
+      }
+
+      // Ensuite créer le profil superadmin dans la base de données
       const { data, error } = await supabase.rpc('create_superadmin_user', {
         admin_email: 'admin@cabinet.ma',
         admin_password: 'AdminCabinet2024!',
@@ -107,16 +130,16 @@ export function AuthPage() {
       });
 
       if (error) {
-        console.error('Erreur lors de la création du superadmin:', error);
+        console.error('Erreur lors de la création du profil:', error);
         toast({
           title: 'Erreur',
-          description: 'Impossible de créer le compte superadmin',
+          description: 'Impossible de créer le profil superadmin',
           variant: 'destructive',
         });
       } else {
         const result = data as CreateSuperAdminResponse;
         
-        if (result?.error) {
+        if (result?.error && !result.error.includes('existe déjà')) {
           toast({
             title: 'Information',
             description: result.error,
@@ -125,24 +148,8 @@ export function AuthPage() {
         } else {
           toast({
             title: 'Compte Superadmin Créé',
-            description: 'Email: admin@cabinet.ma | Mot de passe: AdminCabinet2024!',
+            description: 'Email: admin@cabinet.ma | Mot de passe: AdminCabinet2024! - Vérifiez votre email pour confirmer le compte',
           });
-          
-          // Créer également l'utilisateur dans l'authentification Supabase
-          const { error: authError } = await supabase.auth.signUp({
-            email: 'admin@cabinet.ma',
-            password: 'AdminCabinet2024!',
-            options: {
-              emailRedirectTo: `${window.location.origin}/`,
-              data: {
-                full_name: 'Administrateur Principal',
-              }
-            }
-          });
-
-          if (authError && !authError.message.includes('User already registered')) {
-            console.error('Erreur auth:', authError);
-          }
         }
       }
     } catch (err) {
