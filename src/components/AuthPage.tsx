@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -9,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { AlertCircle, LogIn, UserPlus, Mail, Lock, Shield } from 'lucide-react';
+import { CreateSuperAdminResponse } from '@/types/user';
 
 export function AuthPage() {
   const [email, setEmail] = useState('');
@@ -113,32 +113,36 @@ export function AuthPage() {
           description: 'Impossible de créer le compte superadmin',
           variant: 'destructive',
         });
-      } else if (data?.error) {
-        toast({
-          title: 'Information',
-          description: data.error,
-          variant: 'destructive',
-        });
       } else {
-        toast({
-          title: 'Compte Superadmin Créé',
-          description: 'Email: admin@cabinet.ma | Mot de passe: AdminCabinet2024!',
-        });
+        const result = data as CreateSuperAdminResponse;
         
-        // Créer également l'utilisateur dans l'authentification Supabase
-        const { error: authError } = await supabase.auth.signUp({
-          email: 'admin@cabinet.ma',
-          password: 'AdminCabinet2024!',
-          options: {
-            emailRedirectTo: `${window.location.origin}/`,
-            data: {
-              full_name: 'Administrateur Principal',
+        if (result?.error) {
+          toast({
+            title: 'Information',
+            description: result.error,
+            variant: 'destructive',
+          });
+        } else {
+          toast({
+            title: 'Compte Superadmin Créé',
+            description: 'Email: admin@cabinet.ma | Mot de passe: AdminCabinet2024!',
+          });
+          
+          // Créer également l'utilisateur dans l'authentification Supabase
+          const { error: authError } = await supabase.auth.signUp({
+            email: 'admin@cabinet.ma',
+            password: 'AdminCabinet2024!',
+            options: {
+              emailRedirectTo: `${window.location.origin}/`,
+              data: {
+                full_name: 'Administrateur Principal',
+              }
             }
-          }
-        });
+          });
 
-        if (authError && !authError.message.includes('User already registered')) {
-          console.error('Erreur auth:', authError);
+          if (authError && !authError.message.includes('User already registered')) {
+            console.error('Erreur auth:', authError);
+          }
         }
       }
     } catch (err) {

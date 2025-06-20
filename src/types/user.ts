@@ -13,3 +13,11 @@ export interface CreateUserResponse {
   success?: boolean;
   message?: string;
 }
+
+export interface CreateSuperAdminResponse {
+  error?: string;
+  success?: boolean;
+  message?: string;
+  user_id?: string;
+  email?: string;
+}
