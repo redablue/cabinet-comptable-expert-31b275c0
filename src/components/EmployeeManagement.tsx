@@ -86,7 +86,7 @@ export function EmployeeManagement() {
               <TableRow>
                 <TableHead>Nom & Prénom</TableHead>
                 <TableHead>Contact</TableHead>
-                <tablehead>Poste</tablehead>
+                <TableHead>Poste</TableHead>
                 <TableHead>Statut</TableHead>
                 <TableHead>Date d'embauche</TableHead>
                 <TableHead>Salaire</TableHead>
