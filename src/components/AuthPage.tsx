@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -97,16 +98,25 @@ export function AuthPage() {
   };
 
   const createSuperAdmin = async () => {
+    if (!email || !password) {
+      toast({
+        title: 'Erreur',
+        description: 'Veuillez saisir un email et un mot de passe avant de créer un superadmin',
+        variant: 'destructive',
+      });
+      return;
+    }
+
     setLoading(true);
     try {
       // D'abord créer l'utilisateur dans l'authentification Supabase
       const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-        email: 'admin@cabinet.ma',
-        password: 'AdminCabinet2024!',
+        email: email,
+        password: password,
         options: {
           emailRedirectTo: `${window.location.origin}/`,
           data: {
-            full_name: 'Administrateur Principal',
+            full_name: fullName || 'Administrateur Principal',
           }
         }
       });
@@ -115,7 +125,7 @@ export function AuthPage() {
         console.error('Erreur lors de l\'inscription:', signUpError);
         toast({
           title: 'Erreur',
-          description: 'Impossible de créer le compte d\'authentification',
+          description: 'Impossible de créer le compte d\'authentification: ' + signUpError.message,
           variant: 'destructive',
         });
         setLoading(false);
@@ -124,9 +134,9 @@ export function AuthPage() {
 
       // Ensuite créer le profil superadmin dans la base de données
       const { data, error } = await supabase.rpc('create_superadmin_user', {
-        admin_email: 'admin@cabinet.ma',
-        admin_password: 'AdminCabinet2024!',
-        admin_full_name: 'Administrateur Principal'
+        admin_email: email,
+        admin_password: password,
+        admin_full_name: fullName || 'Administrateur Principal'
       });
 
       if (error) {
@@ -148,7 +158,7 @@ export function AuthPage() {
         } else {
           toast({
             title: 'Compte Superadmin Créé',
-            description: 'Email: admin@cabinet.ma | Mot de passe: AdminCabinet2024! - Vérifiez votre email pour confirmer le compte',
+            description: `Email: ${email} - Vérifiez votre email pour confirmer le compte`,
           });
         }
       }
