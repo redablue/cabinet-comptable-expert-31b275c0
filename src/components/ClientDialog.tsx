@@ -1,24 +1,26 @@
 
 import React, { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
+import { Plus, Edit } from 'lucide-react';
+import type { Database } from '@/integrations/supabase/types';
+
+type Client = Database['public']['Tables']['clients']['Row'];
+type ClientInsert = Database['public']['Tables']['clients']['Insert'];
+type ClientUpdate = Database['public']['Tables']['clients']['Update'];
 
 interface ClientDialogProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onSuccess: () => void;
-  client?: any;
+  client?: Client;
+  onSubmit: (data: ClientInsert | (ClientUpdate & { id: string })) => void;
+  isLoading: boolean;
 }
 
-export function ClientDialog({ isOpen, onClose, onSuccess, client }: ClientDialogProps) {
-  const { toast } = useToast();
-  const [loading, setLoading] = useState(false);
+export function ClientDialog({ client, onSubmit, isLoading }: ClientDialogProps) {
+  const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState({
     nom_commercial: client?.nom_commercial || '',
     raison_sociale: client?.raison_sociale || '',
@@ -40,44 +42,42 @@ export function ClientDialog({ isOpen, onClose, onSuccess, client }: ClientDialo
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-
-    try {
-      if (client) {
-        // Update existing client
-        const { error } = await supabase
-          .from('clients')
-          .update(formData)
-          .eq('id', client.id);
-
-        if (error) throw error;
-        toast({ title: 'Client mis à jour avec succès' });
-      } else {
-        // Create new client
-        const { error } = await supabase
-          .from('clients')
-          .insert([formData]);
-
-        if (error) throw error;
-        toast({ title: 'Client créé avec succès' });
-      }
-
-      onSuccess();
-      onClose();
-    } catch (error) {
-      console.error('Error saving client:', error);
-      toast({
-        title: 'Erreur',
-        description: 'Une erreur est survenue lors de la sauvegarde',
-        variant: 'destructive'
-      });
-    } finally {
-      setLoading(false);
+    
+    if (client) {
+      onSubmit({ ...formData, id: client.id });
+    } else {
+      onSubmit(formData);
     }
+    
+    setOpen(false);
+    setFormData({
+      nom_commercial: '',
+      raison_sociale: '',
+      type_client: 'SARL',
+      email: '',
+      telephone: '',
+      adresse: '',
+      ville: '',
+      code_postal: '',
+      identifiant_fiscal: '',
+      numero_rc: '',
+      ice: '',
+      identifiant_dgi: '',
+      mot_de_passe_dgi: '',
+      identifiant_damancom: '',
+      mot_de_passe_damancom: '',
+      notes: ''
+    });
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button variant={client ? "outline" : "default"} size="sm">
+          {client ? <Edit className="h-4 w-4" /> : <><Plus className="h-4 w-4 mr-2" />Nouveau Client</>}
+        </Button>
+      </DialogTrigger>
+      
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
@@ -122,6 +122,7 @@ export function ClientDialog({ isOpen, onClose, onSuccess, client }: ClientDialo
                     <SelectItem value="SNC">SNC</SelectItem>
                     <SelectItem value="Auto-entrepreneur">Auto-entrepreneur</SelectItem>
                     <SelectItem value="Particulier">Particulier</SelectItem>
+                    <SelectItem value="Association">Association</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -208,7 +209,7 @@ export function ClientDialog({ isOpen, onClose, onSuccess, client }: ClientDialo
             </div>
           </div>
 
-          {/* Identifiants DGI et DAMANCOM */}
+          {/* Identifiants DGI et DAMANCOM avec mots de passe visibles */}
           <div className="space-y-4">
             <h3 className="text-lg font-semibold">Identifiants DGI et DAMANCOM</h3>
             
@@ -230,6 +231,7 @@ export function ClientDialog({ isOpen, onClose, onSuccess, client }: ClientDialo
                     type="text"
                     value={formData.mot_de_passe_dgi}
                     onChange={(e) => setFormData({...formData, mot_de_passe_dgi: e.target.value})}
+                    placeholder="Visible pour l'admin"
                   />
                 </div>
               </div>
@@ -251,6 +253,7 @@ export function ClientDialog({ isOpen, onClose, onSuccess, client }: ClientDialo
                     type="text"
                     value={formData.mot_de_passe_damancom}
                     onChange={(e) => setFormData({...formData, mot_de_passe_damancom: e.target.value})}
+                    placeholder="Visible pour l'admin"
                   />
                 </div>
               </div>
@@ -270,11 +273,11 @@ export function ClientDialog({ isOpen, onClose, onSuccess, client }: ClientDialo
           </div>
 
           <div className="flex justify-end gap-4">
-            <Button type="button" variant="outline" onClick={onClose}>
+            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
               Annuler
             </Button>
-            <Button type="submit" disabled={loading}>
-              {loading ? 'Enregistrement...' : client ? 'Mettre à jour' : 'Créer'}
+            <Button type="submit" disabled={isLoading}>
+              {isLoading ? 'Enregistrement...' : client ? 'Mettre à jour' : 'Créer'}
             </Button>
           </div>
         </form>
