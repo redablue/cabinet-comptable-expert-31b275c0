@@ -218,6 +218,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      create_authorized_user: {
+        Args: { user_email: string; user_role: string; user_full_name: string }
+        Returns: Json
+      }
       has_role: {
         Args: {
           _user_id: string

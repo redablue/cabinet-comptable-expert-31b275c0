@@ -1,3 +1,4 @@
+
 import { Card } from "@/components/ui/card";
 import { Users, FileText, Clock, DollarSign, Shield } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
@@ -15,7 +16,7 @@ export function Dashboard() {
       showToAll: true,
     },
     {
-      title: "Factures ce mois",
+      title: "Ventes ce mois",
       value: "45",
       icon: FileText,
       color: "bg-green-500",
@@ -33,18 +34,18 @@ export function Dashboard() {
       value: formatMAD(125430),
       icon: DollarSign,
       color: "bg-purple-500",
-      showToAll: false, // Seuls admin/superadmin peuvent voir
+      showToAll: false, // Seuls responsable/gérant peuvent voir
     },
   ];
 
-  const canViewFinancials = userRole === 'admin' || userRole === 'superadmin';
+  const canViewFinancials = userRole === 'responsable' || userRole === 'gerant';
 
   return (
     <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-bold mb-2">Tableau de Bord</h2>
         <p className="text-muted-foreground">
-          Vue d'ensemble de votre cabinet comptable
+          Vue d'ensemble de votre station-service
         </p>
       </div>
 
@@ -95,7 +96,7 @@ export function Dashboard() {
           <h3 className="text-lg font-semibold mb-4">Activités Récentes</h3>
           <div className="space-y-3">
             <div className="flex justify-between items-center p-3 bg-muted/50 rounded">
-              <span>Nouvelle facture créée pour Client ABC</span>
+              <span>Nouvelle vente enregistrée - Pompe 1</span>
               <span className="text-sm text-muted-foreground">Il y a 2h</span>
             </div>
             <div className="flex justify-between items-center p-3 bg-muted/50 rounded">
@@ -103,7 +104,7 @@ export function Dashboard() {
               <span className="text-sm text-muted-foreground">Il y a 4h</span>
             </div>
             <div className="flex justify-between items-center p-3 bg-muted/50 rounded">
-              <span>Nouveau client ajouté: Société XYZ</span>
+              <span>Réapprovisionnement carburant</span>
               <span className="text-sm text-muted-foreground">Hier</span>
             </div>
           </div>
@@ -113,15 +114,15 @@ export function Dashboard() {
           <h3 className="text-lg font-semibold mb-4">Tâches Urgentes</h3>
           <div className="space-y-3">
             <div className="flex justify-between items-center p-3 bg-red-50 border border-red-200 rounded">
-              <span>Déclaration TVA - Société ABC</span>
+              <span>Maintenance Pompe 3</span>
               <span className="text-sm text-red-600 font-medium">Urgent</span>
             </div>
             <div className="flex justify-between items-center p-3 bg-orange-50 border border-orange-200 rounded">
-              <span>Bilan comptable - Client DEF</span>
+              <span>Vérification stock carburant</span>
               <span className="text-sm text-orange-600 font-medium">3 jours</span>
             </div>
             <div className="flex justify-between items-center p-3 bg-yellow-50 border border-yellow-200 rounded">
-              <span>Révision comptes - GHI SARL</span>
+              <span>Rapport mensuel</span>
               <span className="text-sm text-yellow-600 font-medium">1 semaine</span>
             </div>
           </div>

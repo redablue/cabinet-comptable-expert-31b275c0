@@ -28,7 +28,7 @@ export function UserManagement() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [newUserEmail, setNewUserEmail] = useState('');
   const [newUserFullName, setNewUserFullName] = useState('');
-  const [newUserRole, setNewUserRole] = useState<string>('assistant');
+  const [newUserRole, setNewUserRole] = useState<string>('pompiste');
   const [loading, setLoading] = useState(false);
   const { userRole } = useAuth();
   const { toast } = useToast();
@@ -64,19 +64,48 @@ export function UserManagement() {
     setLoading(true);
     
     try {
-      // For now, we'll show a message that this feature requires full database setup
+      // Créer l'utilisateur autorisé via la fonction RPC
+      const { data, error: rpcError } = await supabase.rpc('create_authorized_user', {
+        user_email: newUserEmail,
+        user_role: newUserRole,
+        user_full_name: newUserFullName
+      });
+
+      if (rpcError) {
+        console.error('RPC Error:', rpcError);
+        toast({
+          title: 'Erreur',
+          description: 'Erreur lors de la création de l\'utilisateur',
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      // Vérifier si la réponse contient une erreur
+      if (data && data.error) {
+        toast({
+          title: 'Erreur',
+          description: data.error,
+          variant: 'destructive',
+        });
+        return;
+      }
+
       toast({
-        title: 'Fonctionnalité en cours de développement',
-        description: 'La création d\'utilisateurs nécessite la configuration complète de la base de données. Contactez votre développeur.',
-        variant: 'destructive',
+        title: 'Succès',
+        description: 'Utilisateur créé avec succès. Il peut maintenant s\'inscrire avec cet email.',
       });
       
       setNewUserEmail('');
       setNewUserFullName('');
-      setNewUserRole('assistant');
+      setNewUserRole('pompiste');
       setIsDialogOpen(false);
       
+      // Actualiser la liste des utilisateurs
+      fetchUserProfiles();
+      
     } catch (error) {
+      console.error('Create user error:', error);
       toast({
         title: 'Erreur',
         description: 'Une erreur est survenue lors de la création',
@@ -89,23 +118,33 @@ export function UserManagement() {
 
   const getRoleBadgeColor = (role: string) => {
     switch (role) {
-      case 'superadmin': return 'bg-red-100 text-red-800';
-      case 'admin': return 'bg-blue-100 text-blue-800';
-      case 'comptable': return 'bg-green-100 text-green-800';
-      case 'assistant': return 'bg-gray-100 text-gray-800';
+      case 'gerant': return 'bg-red-100 text-red-800';
+      case 'responsable': return 'bg-blue-100 text-blue-800';
+      case 'caissier': return 'bg-green-100 text-green-800';
+      case 'pompiste': return 'bg-gray-100 text-gray-800';
       default: return 'bg-gray-100 text-gray-800';
     }
   };
 
   const getRoleIcon = (role: string) => {
     switch (role) {
-      case 'superadmin': return <Shield className="h-4 w-4" />;
-      case 'admin': return <UserCheck className="h-4 w-4" />;
+      case 'gerant': return <Shield className="h-4 w-4" />;
+      case 'responsable': return <UserCheck className="h-4 w-4" />;
       default: return <Users className="h-4 w-4" />;
     }
   };
 
-  if (userRole !== 'admin' && userRole !== 'superadmin') {
+  const getRoleDisplayName = (role: string) => {
+    switch (role) {
+      case 'gerant': return 'Gérant';
+      case 'responsable': return 'Responsable';
+      case 'caissier': return 'Caissier';
+      case 'pompiste': return 'Pompiste';
+      default: return role;
+    }
+  };
+
+  if (userRole !== 'responsable' && userRole !== 'gerant') {
     return (
       <div className="p-6">
         <Card className="p-6 text-center">
@@ -125,7 +164,7 @@ export function UserManagement() {
         <div>
           <h2 className="text-2xl font-bold">Gestion des Utilisateurs</h2>
           <p className="text-muted-foreground">
-            Gérez les utilisateurs du système de gestion comptable
+            Gérez les utilisateurs du système de gestion de station-service
           </p>
         </div>
         
@@ -166,7 +205,7 @@ export function UserManagement() {
                   type="email"
                   value={newUserEmail}
                   onChange={(e) => setNewUserEmail(e.target.value)}
-                  placeholder="utilisateur@cabinet.ma"
+                  placeholder="utilisateur@station.ma"
                 />
               </div>
               
@@ -177,11 +216,11 @@ export function UserManagement() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="assistant">Assistant</SelectItem>
-                    <SelectItem value="comptable">Comptable</SelectItem>
-                    <SelectItem value="admin">Administrateur</SelectItem>
-                    {userRole === 'superadmin' && (
-                      <SelectItem value="superadmin">Super Administrateur</SelectItem>
+                    <SelectItem value="pompiste">Pompiste</SelectItem>
+                    <SelectItem value="caissier">Caissier</SelectItem>
+                    <SelectItem value="responsable">Responsable</SelectItem>
+                    {userRole === 'gerant' && (
+                      <SelectItem value="gerant">Gérant</SelectItem>
                     )}
                   </SelectContent>
                 </Select>
@@ -215,7 +254,7 @@ export function UserManagement() {
                   <Badge className={getRoleBadgeColor(user.role)}>
                     <div className="flex items-center gap-1">
                       {getRoleIcon(user.role)}
-                      {user.role}
+                      {getRoleDisplayName(user.role)}
                     </div>
                   </Badge>
                 </TableCell>
@@ -232,8 +271,8 @@ export function UserManagement() {
       <Alert>
         <AlertCircle className="h-4 w-4" />
         <AlertDescription>
-          <strong>Note :</strong> La création d'utilisateurs nécessite la configuration complète de la base de données. 
-          Actuellement, vous pouvez voir les utilisateurs existants mais la création nécessite des étapes supplémentaires.
+          <strong>Note :</strong> Seuls les utilisateurs créés par l'administrateur peuvent se connecter au système. 
+          L'inscription libre est désactivée pour des raisons de sécurité.
         </AlertDescription>
       </Alert>
     </div>
