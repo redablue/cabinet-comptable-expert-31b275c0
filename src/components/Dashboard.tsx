@@ -1,34 +1,43 @@
-
 import { Card } from "@/components/ui/card";
-import { Users, FileText, Clock, DollarSign } from "lucide-react";
+import { Users, FileText, Clock, DollarSign, Shield } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { formatMAD } from "@/utils/currency";
 
 export function Dashboard() {
+  const { userRole } = useAuth();
+  
   const stats = [
     {
       title: "Clients Actifs",
       value: "127",
       icon: Users,
       color: "bg-blue-500",
+      showToAll: true,
     },
     {
       title: "Factures ce mois",
       value: "45",
       icon: FileText,
       color: "bg-green-500",
+      showToAll: true,
     },
     {
       title: "Tâches en cours",
       value: "23",
       icon: Clock,
       color: "bg-orange-500",
+      showToAll: true,
     },
     {
       title: "Chiffre d'affaires",
-      value: "125,430 MAD",
+      value: formatMAD(125430),
       icon: DollarSign,
       color: "bg-purple-500",
+      showToAll: false, // Seuls admin/superadmin peuvent voir
     },
   ];
+
+  const canViewFinancials = userRole === 'admin' || userRole === 'superadmin';
 
   return (
     <div className="space-y-6">
@@ -40,21 +49,45 @@ export function Dashboard() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {stats.map((stat, index) => (
-          <Card key={index} className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">
-                  {stat.title}
-                </p>
-                <p className="text-2xl font-bold">{stat.value}</p>
+        {stats.map((stat, index) => {
+          // Masquer le chiffre d'affaires si l'utilisateur n'a pas les permissions
+          if (!stat.showToAll && !canViewFinancials) {
+            return (
+              <Card key={index} className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">
+                      {stat.title}
+                    </p>
+                    <div className="flex items-center gap-2 mt-1">
+                      <Shield className="h-4 w-4 text-muted-foreground" />
+                      <p className="text-sm text-muted-foreground">Accès restreint</p>
+                    </div>
+                  </div>
+                  <div className={`p-3 rounded-full ${stat.color} opacity-50`}>
+                    <stat.icon className="h-6 w-6 text-white" />
+                  </div>
+                </div>
+              </Card>
+            );
+          }
+
+          return (
+            <Card key={index} className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">
+                    {stat.title}
+                  </p>
+                  <p className="text-2xl font-bold">{stat.value}</p>
+                </div>
+                <div className={`p-3 rounded-full ${stat.color}`}>
+                  <stat.icon className="h-6 w-6 text-white" />
+                </div>
               </div>
-              <div className={`p-3 rounded-full ${stat.color}`}>
-                <stat.icon className="h-6 w-6 text-white" />
-              </div>
-            </div>
-          </Card>
-        ))}
+            </Card>
+          );
+        })}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

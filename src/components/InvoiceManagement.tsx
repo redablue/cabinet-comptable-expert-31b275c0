@@ -1,10 +1,10 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Plus, Search, Download, Eye, DollarSign } from "lucide-react";
+import { formatMAD } from "@/utils/currency";
 
 interface Invoice {
   id: number;
@@ -67,13 +67,6 @@ export function InvoiceManagement() {
     }
   };
 
-  const formatAmount = (amount: number) => {
-    return new Intl.NumberFormat('fr-MA', {
-      style: 'currency',
-      currency: 'MAD'
-    }).format(amount);
-  };
-
   const totalAmount = invoices.reduce((sum, invoice) => sum + invoice.amount, 0);
   const paidAmount = invoices
     .filter(invoice => invoice.status === 'Payée')
@@ -85,7 +78,7 @@ export function InvoiceManagement() {
         <div>
           <h2 className="text-2xl font-bold">Gestion de Facturation</h2>
           <p className="text-muted-foreground">
-            Créez et gérez vos factures clients
+            Créez et gérez vos factures clients - Conforme à la loi marocaine
           </p>
         </div>
         <Button className="gap-2">
@@ -99,7 +92,8 @@ export function InvoiceManagement() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-muted-foreground">Chiffre d'affaires total</p>
-              <p className="text-2xl font-bold">{formatAmount(totalAmount)}</p>
+              <p className="text-2xl font-bold">{formatMAD(totalAmount)}</p>
+              <p className="text-xs text-muted-foreground">TVA 20% incluse</p>
             </div>
             <DollarSign className="h-8 w-8 text-green-600" />
           </div>
@@ -108,7 +102,8 @@ export function InvoiceManagement() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-muted-foreground">Montant encaissé</p>
-              <p className="text-2xl font-bold">{formatAmount(paidAmount)}</p>
+              <p className="text-2xl font-bold">{formatMAD(paidAmount)}</p>
+              <p className="text-xs text-muted-foreground">TVA 20% incluse</p>
             </div>
             <DollarSign className="h-8 w-8 text-blue-600" />
           </div>
@@ -117,7 +112,8 @@ export function InvoiceManagement() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-muted-foreground">En attente</p>
-              <p className="text-2xl font-bold">{formatAmount(totalAmount - paidAmount)}</p>
+              <p className="text-2xl font-bold">{formatMAD(totalAmount - paidAmount)}</p>
+              <p className="text-xs text-muted-foreground">TVA 20% incluse</p>
             </div>
             <DollarSign className="h-8 w-8 text-orange-600" />
           </div>
@@ -144,7 +140,7 @@ export function InvoiceManagement() {
               <TableHead>Client</TableHead>
               <TableHead>Date</TableHead>
               <TableHead>Échéance</TableHead>
-              <TableHead>Montant</TableHead>
+              <TableHead>Montant TTC</TableHead>
               <TableHead>Statut</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
@@ -161,7 +157,7 @@ export function InvoiceManagement() {
                 </TableCell>
                 <TableCell>{new Date(invoice.date).toLocaleDateString('fr-FR')}</TableCell>
                 <TableCell>{new Date(invoice.dueDate).toLocaleDateString('fr-FR')}</TableCell>
-                <TableCell className="font-medium">{formatAmount(invoice.amount)}</TableCell>
+                <TableCell className="font-medium">{formatMAD(invoice.amount)}</TableCell>
                 <TableCell>
                   <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(invoice.status)}`}>
                     {invoice.status}
