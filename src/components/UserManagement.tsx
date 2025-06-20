@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -21,6 +20,12 @@ interface UserProfile {
   role: string;
   created_at: string;
   phone?: string;
+}
+
+interface CreateUserResponse {
+  error?: string;
+  success?: boolean;
+  message?: string;
 }
 
 export function UserManagement() {
@@ -81,11 +86,12 @@ export function UserManagement() {
         return;
       }
 
-      // Vérifier si la réponse contient une erreur
-      if (data && data.error) {
+      // Type guard to check if data is an object with error property
+      const response = data as CreateUserResponse;
+      if (response && typeof response === 'object' && response.error) {
         toast({
           title: 'Erreur',
-          description: data.error,
+          description: response.error,
           variant: 'destructive',
         });
         return;
