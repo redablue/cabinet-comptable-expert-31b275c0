@@ -12,6 +12,7 @@ import type { Database } from '@/integrations/supabase/types';
 type Client = Database['public']['Tables']['clients']['Row'];
 type ClientInsert = Database['public']['Tables']['clients']['Insert'];
 type ClientUpdate = Database['public']['Tables']['clients']['Update'];
+type ClientType = Database['public']['Enums']['client_type'];
 
 interface ClientDialogProps {
   client?: Client;
@@ -24,7 +25,7 @@ export function ClientDialog({ client, onSubmit, isLoading }: ClientDialogProps)
   const [formData, setFormData] = useState({
     nom_commercial: client?.nom_commercial || '',
     raison_sociale: client?.raison_sociale || '',
-    type_client: client?.type_client || 'SARL',
+    type_client: (client?.type_client || 'SARL') as ClientType,
     email: client?.email || '',
     telephone: client?.telephone || '',
     adresse: client?.adresse || '',
@@ -53,7 +54,7 @@ export function ClientDialog({ client, onSubmit, isLoading }: ClientDialogProps)
     setFormData({
       nom_commercial: '',
       raison_sociale: '',
-      type_client: 'SARL',
+      type_client: 'SARL' as ClientType,
       email: '',
       telephone: '',
       adresse: '',
@@ -112,7 +113,7 @@ export function ClientDialog({ client, onSubmit, isLoading }: ClientDialogProps)
 
               <div>
                 <Label htmlFor="type_client">Type de client</Label>
-                <Select value={formData.type_client} onValueChange={(value) => setFormData({...formData, type_client: value})}>
+                <Select value={formData.type_client} onValueChange={(value: ClientType) => setFormData({...formData, type_client: value})}>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
