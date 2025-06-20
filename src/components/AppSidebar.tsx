@@ -53,7 +53,7 @@ const menuItems = [
     roles: ['superadmin', 'admin', 'employee'],
   },
   {
-    title: "Facturation",
+    title: "Gestion des Factures",
     id: "invoices",
     icon: FileText,
     roles: ['superadmin', 'admin', 'employee'],

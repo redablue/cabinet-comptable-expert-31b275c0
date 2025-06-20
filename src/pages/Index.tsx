@@ -4,14 +4,13 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { Dashboard } from "@/components/Dashboard";
 import { ClientManagement } from "@/components/ClientManagement";
-import { TaskManagement } from "@/components/TaskManagement";
 import { TasksManagement } from "@/components/TasksManagement";
 import { EmployeeManagement } from "@/components/EmployeeManagement";
 import { InvoiceManagement } from "@/components/InvoiceManagement";
+import { DocumentManagement } from "@/components/DocumentManagement";
 import { CalendrierFiscal } from "@/components/CalendrierFiscal";
 import { Parametres } from "@/components/Parametres";
 import { UserManagement } from "@/components/UserManagement";
-import { DocumentManagement } from "@/components/DocumentManagement";
 import { useAuth } from "@/hooks/useAuth";
 
 const Index = () => {
