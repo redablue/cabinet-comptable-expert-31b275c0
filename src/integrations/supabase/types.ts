@@ -222,13 +222,6 @@ export type Database = {
         Args: { user_email: string; user_role: string; user_full_name: string }
         Returns: Json
       }
-      has_role: {
-        Args: {
-          _user_id: string
-          _role: Database["public"]["Enums"]["user_role"]
-        }
-        Returns: boolean
-      }
       is_manager_or_higher: {
         Args: Record<PropertyKey, never> | { _user_id: string }
         Returns: boolean
@@ -236,7 +229,7 @@ export type Database = {
     }
     Enums: {
       fuel_type: "gasoil" | "essence" | "melange"
-      user_role: "gerant" | "responsable" | "caissier" | "pompiste"
+      user_role: "superadmin" | "admin" | "employee" | "trainee"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -353,7 +346,7 @@ export const Constants = {
   public: {
     Enums: {
       fuel_type: ["gasoil", "essence", "melange"],
-      user_role: ["gerant", "responsable", "caissier", "pompiste"],
+      user_role: ["superadmin", "admin", "employee", "trainee"],
     },
   },
 } as const

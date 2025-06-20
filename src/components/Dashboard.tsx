@@ -16,7 +16,7 @@ export function Dashboard() {
       showToAll: true,
     },
     {
-      title: "Ventes ce mois",
+      title: "Factures ce mois",
       value: "45",
       icon: FileText,
       color: "bg-green-500",
@@ -27,32 +27,35 @@ export function Dashboard() {
       value: "23",
       icon: Clock,
       color: "bg-orange-500",
-      showToAll: true,
+      roles: ['superadmin', 'admin', 'employee'], // Masqué pour les stagiaires
     },
     {
       title: "Chiffre d'affaires",
       value: formatMAD(125430),
       icon: DollarSign,
       color: "bg-purple-500",
-      showToAll: false, // Seuls responsable/gérant peuvent voir
+      roles: ['superadmin', 'admin'], // Seuls superadmin et admin peuvent voir
     },
   ];
 
-  const canViewFinancials = userRole === 'responsable' || userRole === 'gerant';
+  const canViewStat = (stat: any) => {
+    if (stat.showToAll) return true;
+    if (!stat.roles) return true;
+    return stat.roles.includes(userRole);
+  };
 
   return (
     <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-bold mb-2">Tableau de Bord</h2>
         <p className="text-muted-foreground">
-          Vue d'ensemble de votre station-service
+          Vue d'ensemble de votre cabinet comptable
         </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {stats.map((stat, index) => {
-          // Masquer le chiffre d'affaires si l'utilisateur n'a pas les permissions
-          if (!stat.showToAll && !canViewFinancials) {
+          if (!canViewStat(stat)) {
             return (
               <Card key={index} className="p-6">
                 <div className="flex items-center justify-between">
@@ -96,15 +99,15 @@ export function Dashboard() {
           <h3 className="text-lg font-semibold mb-4">Activités Récentes</h3>
           <div className="space-y-3">
             <div className="flex justify-between items-center p-3 bg-muted/50 rounded">
-              <span>Nouvelle vente enregistrée - Pompe 1</span>
+              <span>Nouvelle facture créée - Client ABC</span>
               <span className="text-sm text-muted-foreground">Il y a 2h</span>
             </div>
             <div className="flex justify-between items-center p-3 bg-muted/50 rounded">
-              <span>Tâche assignée à Mohamed Alami</span>
+              <span>Tâche assignée à Ahmed Alami</span>
               <span className="text-sm text-muted-foreground">Il y a 4h</span>
             </div>
             <div className="flex justify-between items-center p-3 bg-muted/50 rounded">
-              <span>Réapprovisionnement carburant</span>
+              <span>Rapport mensuel généré</span>
               <span className="text-sm text-muted-foreground">Hier</span>
             </div>
           </div>
@@ -114,11 +117,11 @@ export function Dashboard() {
           <h3 className="text-lg font-semibold mb-4">Tâches Urgentes</h3>
           <div className="space-y-3">
             <div className="flex justify-between items-center p-3 bg-red-50 border border-red-200 rounded">
-              <span>Maintenance Pompe 3</span>
+              <span>Déclaration TVA Client XYZ</span>
               <span className="text-sm text-red-600 font-medium">Urgent</span>
             </div>
             <div className="flex justify-between items-center p-3 bg-orange-50 border border-orange-200 rounded">
-              <span>Vérification stock carburant</span>
+              <span>Révision comptable</span>
               <span className="text-sm text-orange-600 font-medium">3 jours</span>
             </div>
             <div className="flex justify-between items-center p-3 bg-yellow-50 border border-yellow-200 rounded">

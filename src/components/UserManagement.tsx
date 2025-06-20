@@ -31,7 +31,7 @@ export function UserManagement() {
     setUserProfiles(data || []);
   };
 
-  if (userRole !== 'responsable' && userRole !== 'gerant') {
+  if (userRole !== 'superadmin' && userRole !== 'admin') {
     return <AccessDenied />;
   }
 
@@ -41,7 +41,7 @@ export function UserManagement() {
         <div>
           <h2 className="text-2xl font-bold">Gestion des Utilisateurs</h2>
           <p className="text-muted-foreground">
-            Gérez les utilisateurs du système de gestion de station-service
+            Gérez les utilisateurs du système de gestion du cabinet comptable
           </p>
         </div>
         

@@ -26,43 +26,43 @@ const menuItems = [
     title: "Tableau de bord",
     id: "dashboard",
     icon: BarChart3,
-    roles: ['gerant', 'responsable', 'caissier', 'pompiste'],
+    roles: ['superadmin', 'admin', 'employee', 'trainee'],
   },
   {
     title: "Gestion Clientèle",
     id: "clients",
     icon: Users,
-    roles: ['gerant', 'responsable', 'caissier', 'pompiste'],
+    roles: ['superadmin', 'admin', 'employee', 'trainee'],
   },
   {
     title: "Tâches Employés",
     id: "tasks",
     icon: Calendar,
-    roles: ['gerant', 'responsable', 'caissier'],
+    roles: ['superadmin', 'admin', 'employee'],
   },
   {
     title: "Facturation",
     id: "invoices",
     icon: FileText,
-    roles: ['gerant', 'responsable', 'caissier'],
+    roles: ['superadmin', 'admin', 'employee'],
   },
   {
     title: "Calendrier Fiscal",
     id: "calendrier-fiscal",
     icon: CalendarDays,
-    roles: ['gerant', 'responsable', 'caissier'],
+    roles: ['superadmin', 'admin'],
   },
   {
     title: "Gestion Utilisateurs",
     id: "users",
     icon: UserCheck,
-    roles: ['gerant', 'responsable'],
+    roles: ['superadmin', 'admin'],
   },
   {
     title: "Paramètres",
     id: "parametres",
     icon: Settings,
-    roles: ['gerant', 'responsable'],
+    roles: ['superadmin', 'admin'],
   },
 ];
 
@@ -71,20 +71,20 @@ export function AppSidebar({ activeSection, setActiveSection }: AppSidebarProps)
 
   const getRoleBadgeColor = (role: string) => {
     switch (role) {
-      case 'gerant': return 'bg-red-100 text-red-800';
-      case 'responsable': return 'bg-blue-100 text-blue-800';
-      case 'caissier': return 'bg-green-100 text-green-800';
-      case 'pompiste': return 'bg-gray-100 text-gray-800';
+      case 'superadmin': return 'bg-purple-100 text-purple-800';
+      case 'admin': return 'bg-red-100 text-red-800';
+      case 'employee': return 'bg-blue-100 text-blue-800';
+      case 'trainee': return 'bg-gray-100 text-gray-800';
       default: return 'bg-gray-100 text-gray-800';
     }
   };
 
   const getRoleDisplayName = (role: string) => {
     switch (role) {
-      case 'gerant': return 'Gérant';
-      case 'responsable': return 'Responsable';
-      case 'caissier': return 'Caissier';
-      case 'pompiste': return 'Pompiste';
+      case 'superadmin': return 'Super Admin';
+      case 'admin': return 'Administrateur';
+      case 'employee': return 'Employé';
+      case 'trainee': return 'Stagiaire';
       default: return role;
     }
   };
@@ -99,7 +99,7 @@ export function AppSidebar({ activeSection, setActiveSection }: AppSidebarProps)
         <div className="flex items-center gap-2">
           <MapPin className="h-6 w-6 text-primary" />
           <div>
-            <h2 className="font-bold text-lg">Station Service</h2>
+            <h2 className="font-bold text-lg">Cabinet Comptable</h2>
             <p className="text-sm text-muted-foreground">Gestion</p>
           </div>
         </div>

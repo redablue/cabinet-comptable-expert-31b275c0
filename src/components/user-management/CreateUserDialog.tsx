@@ -20,7 +20,7 @@ export function CreateUserDialog({ onUserCreated }: CreateUserDialogProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [newUserEmail, setNewUserEmail] = useState('');
   const [newUserFullName, setNewUserFullName] = useState('');
-  const [newUserRole, setNewUserRole] = useState<string>('pompiste');
+  const [newUserRole, setNewUserRole] = useState<string>('trainee');
   const [loading, setLoading] = useState(false);
   const { userRole } = useAuth();
   const { toast } = useToast();
@@ -73,7 +73,7 @@ export function CreateUserDialog({ onUserCreated }: CreateUserDialogProps) {
       
       setNewUserEmail('');
       setNewUserFullName('');
-      setNewUserRole('pompiste');
+      setNewUserRole('trainee');
       setIsDialogOpen(false);
       
       // Actualiser la liste des utilisateurs
@@ -129,7 +129,7 @@ export function CreateUserDialog({ onUserCreated }: CreateUserDialogProps) {
               type="email"
               value={newUserEmail}
               onChange={(e) => setNewUserEmail(e.target.value)}
-              placeholder="utilisateur@station.ma"
+              placeholder="utilisateur@cabinet.ma"
             />
           </div>
           
@@ -140,11 +140,11 @@ export function CreateUserDialog({ onUserCreated }: CreateUserDialogProps) {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="pompiste">Pompiste</SelectItem>
-                <SelectItem value="caissier">Caissier</SelectItem>
-                <SelectItem value="responsable">Responsable</SelectItem>
-                {userRole === 'gerant' && (
-                  <SelectItem value="gerant">Gérant</SelectItem>
+                <SelectItem value="trainee">Stagiaire</SelectItem>
+                <SelectItem value="employee">Employé</SelectItem>
+                <SelectItem value="admin">Administrateur</SelectItem>
+                {userRole === 'superadmin' && (
+                  <SelectItem value="superadmin">Super Admin</SelectItem>
                 )}
               </SelectContent>
             </Select>
