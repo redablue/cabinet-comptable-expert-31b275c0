@@ -9,78 +9,6 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      fuel_tanks: {
-        Row: {
-          capacity: number
-          created_at: string | null
-          current_level: number
-          fuel_type: Database["public"]["Enums"]["fuel_type"]
-          id: string
-          min_threshold: number
-          name: string
-          price_per_liter: number
-          updated_at: string | null
-        }
-        Insert: {
-          capacity: number
-          created_at?: string | null
-          current_level?: number
-          fuel_type: Database["public"]["Enums"]["fuel_type"]
-          id?: string
-          min_threshold?: number
-          name: string
-          price_per_liter: number
-          updated_at?: string | null
-        }
-        Update: {
-          capacity?: number
-          created_at?: string | null
-          current_level?: number
-          fuel_type?: Database["public"]["Enums"]["fuel_type"]
-          id?: string
-          min_threshold?: number
-          name?: string
-          price_per_liter?: number
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
-      inventory_items: {
-        Row: {
-          category: string
-          created_at: string | null
-          current_stock: number
-          id: string
-          min_threshold: number
-          name: string
-          supplier: string | null
-          unit_price: number
-          updated_at: string | null
-        }
-        Insert: {
-          category: string
-          created_at?: string | null
-          current_stock?: number
-          id?: string
-          min_threshold?: number
-          name: string
-          supplier?: string | null
-          unit_price: number
-          updated_at?: string | null
-        }
-        Update: {
-          category?: string
-          created_at?: string | null
-          current_stock?: number
-          id?: string
-          min_threshold?: number
-          name?: string
-          supplier?: string | null
-          unit_price?: number
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
       profiles: {
         Row: {
           created_at: string | null
@@ -111,108 +39,6 @@ export type Database = {
         }
         Relationships: []
       }
-      pumps: {
-        Row: {
-          created_at: string | null
-          fuel_tank_id: string
-          id: string
-          last_maintenance: string | null
-          name: string
-          position_number: number
-          status: string
-          total_dispensed: number
-          updated_at: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          fuel_tank_id: string
-          id?: string
-          last_maintenance?: string | null
-          name: string
-          position_number: number
-          status?: string
-          total_dispensed?: number
-          updated_at?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          fuel_tank_id?: string
-          id?: string
-          last_maintenance?: string | null
-          name?: string
-          position_number?: number
-          status?: string
-          total_dispensed?: number
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "pumps_fuel_tank_id_fkey"
-            columns: ["fuel_tank_id"]
-            isOneToOne: false
-            referencedRelation: "fuel_tanks"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      sales: {
-        Row: {
-          created_at: string | null
-          fuel_tank_id: string
-          id: string
-          payment_method: string
-          price_per_liter: number
-          pump_id: string | null
-          quantity: number
-          total_amount: number
-          user_id: string
-        }
-        Insert: {
-          created_at?: string | null
-          fuel_tank_id: string
-          id?: string
-          payment_method?: string
-          price_per_liter: number
-          pump_id?: string | null
-          quantity: number
-          total_amount: number
-          user_id: string
-        }
-        Update: {
-          created_at?: string | null
-          fuel_tank_id?: string
-          id?: string
-          payment_method?: string
-          price_per_liter?: number
-          pump_id?: string | null
-          quantity?: number
-          total_amount?: number
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "sales_fuel_tank_id_fkey"
-            columns: ["fuel_tank_id"]
-            isOneToOne: false
-            referencedRelation: "fuel_tanks"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "sales_pump_id_fkey"
-            columns: ["pump_id"]
-            isOneToOne: false
-            referencedRelation: "pumps"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "sales_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
     }
     Views: {
       [_ in never]: never
@@ -228,7 +54,6 @@ export type Database = {
       }
     }
     Enums: {
-      fuel_type: "gasoil" | "essence" | "melange"
       user_role: "superadmin" | "admin" | "employee" | "trainee"
     }
     CompositeTypes: {
@@ -345,7 +170,6 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      fuel_type: ["gasoil", "essence", "melange"],
       user_role: ["superadmin", "admin", "employee", "trainee"],
     },
   },
