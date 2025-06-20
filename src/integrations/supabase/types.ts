@@ -9,6 +9,89 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      clients: {
+        Row: {
+          adresse: string | null
+          code_postal: string | null
+          created_at: string
+          created_by: string | null
+          date_creation: string
+          email: string | null
+          ice: string | null
+          id: string
+          identifiant_damancom: string | null
+          identifiant_dgi: string | null
+          identifiant_fiscal: string | null
+          mot_de_passe_damancom: string | null
+          mot_de_passe_dgi: string | null
+          nom_commercial: string
+          notes: string | null
+          numero_rc: string | null
+          raison_sociale: string | null
+          statut: Database["public"]["Enums"]["client_status"]
+          telephone: string | null
+          type_client: Database["public"]["Enums"]["client_type"]
+          updated_at: string
+          ville: string | null
+        }
+        Insert: {
+          adresse?: string | null
+          code_postal?: string | null
+          created_at?: string
+          created_by?: string | null
+          date_creation?: string
+          email?: string | null
+          ice?: string | null
+          id?: string
+          identifiant_damancom?: string | null
+          identifiant_dgi?: string | null
+          identifiant_fiscal?: string | null
+          mot_de_passe_damancom?: string | null
+          mot_de_passe_dgi?: string | null
+          nom_commercial: string
+          notes?: string | null
+          numero_rc?: string | null
+          raison_sociale?: string | null
+          statut?: Database["public"]["Enums"]["client_status"]
+          telephone?: string | null
+          type_client?: Database["public"]["Enums"]["client_type"]
+          updated_at?: string
+          ville?: string | null
+        }
+        Update: {
+          adresse?: string | null
+          code_postal?: string | null
+          created_at?: string
+          created_by?: string | null
+          date_creation?: string
+          email?: string | null
+          ice?: string | null
+          id?: string
+          identifiant_damancom?: string | null
+          identifiant_dgi?: string | null
+          identifiant_fiscal?: string | null
+          mot_de_passe_damancom?: string | null
+          mot_de_passe_dgi?: string | null
+          nom_commercial?: string
+          notes?: string | null
+          numero_rc?: string | null
+          raison_sociale?: string | null
+          statut?: Database["public"]["Enums"]["client_status"]
+          telephone?: string | null
+          type_client?: Database["public"]["Enums"]["client_type"]
+          updated_at?: string
+          ville?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "clients_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string | null
@@ -54,6 +137,13 @@ export type Database = {
       }
     }
     Enums: {
+      client_status: "Actif" | "Inactif" | "Suspendu"
+      client_type:
+        | "SARL"
+        | "SA"
+        | "Auto-entrepreneur"
+        | "Particulier"
+        | "Association"
       user_role: "superadmin" | "admin" | "employee" | "trainee"
     }
     CompositeTypes: {
@@ -170,6 +260,14 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      client_status: ["Actif", "Inactif", "Suspendu"],
+      client_type: [
+        "SARL",
+        "SA",
+        "Auto-entrepreneur",
+        "Particulier",
+        "Association",
+      ],
       user_role: ["superadmin", "admin", "employee", "trainee"],
     },
   },

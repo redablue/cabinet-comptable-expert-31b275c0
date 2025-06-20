@@ -4,77 +4,34 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plus, Search, Edit, Trash2, Phone, Mail, Eye, EyeOff } from "lucide-react";
+import { Search, Edit, Trash2, Phone, Mail, Eye, EyeOff, Loader2 } from "lucide-react";
+import { ClientDialog } from "@/components/ClientDialog";
+import { useClients } from "@/hooks/useClients";
+import type { Database } from '@/integrations/supabase/types';
 
-interface Client {
-  id: number;
-  name: string;
-  company: string;
-  email: string;
-  phone: string;
-  address: string;
-  type: string;
-  status: string;
-  dgiLogin: string;
-  dgiPassword: string;
-  damancomLogin: string;
-  damancomPassword: string;
-}
+type Client = Database['public']['Tables']['clients']['Row'];
 
 export function ClientManagement() {
   const [searchTerm, setSearchTerm] = useState("");
   const [visiblePasswords, setVisiblePasswords] = useState<{[key: string]: boolean}>({});
-  const [clients] = useState<Client[]>([
-    {
-      id: 1,
-      name: "Ahmed Benali",
-      company: "Société ABC SARL",
-      email: "ahmed@abc.ma",
-      phone: "0661234567",
-      address: "Casablanca, Maroc",
-      type: "SARL",
-      status: "Actif",
-      dgiLogin: "ahmed_abc_2024",
-      dgiPassword: "DGI@2024!ABC",
-      damancomLogin: "abc_sarl_dm",
-      damancomPassword: "Damancom@123"
-    },
-    {
-      id: 2,
-      name: "Fatima Alami",
-      company: "Boutique Fashion",
-      email: "fatima@fashion.ma",
-      phone: "0662345678",
-      address: "Rabat, Maroc",
-      type: "Auto-entrepreneur",
-      status: "Actif",
-      dgiLogin: "fatima_fashion",
-      dgiPassword: "Fashion2024#",
-      damancomLogin: "boutique_fm",
-      damancomPassword: "DM_Fashion@2024"
-    },
-    {
-      id: 3,
-      name: "Mohamed Tahiri",
-      company: "Construction Pro",
-      email: "mohamed@constructionpro.ma",
-      phone: "0663456789",
-      address: "Marrakech, Maroc",
-      type: "SA",
-      status: "En attente",
-      dgiLogin: "construc_pro_mt",
-      dgiPassword: "ConstrDGI@2024",
-      damancomLogin: "construction_dm",
-      damancomPassword: "ProConstruct@123"
-    }
-  ]);
+  
+  const { 
+    clients, 
+    isLoading, 
+    createClient, 
+    updateClient, 
+    deleteClient,
+    isCreating,
+    isUpdating,
+    isDeleting
+  } = useClients();
 
   const filteredClients = clients.filter(client =>
-    client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    client.company.toLowerCase().includes(searchTerm.toLowerCase())
+    client.nom_commercial.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (client.raison_sociale && client.raison_sociale.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
-  const togglePasswordVisibility = (clientId: number, field: string) => {
+  const togglePasswordVisibility = (clientId: string, field: string) => {
     const key = `${clientId}-${field}`;
     setVisiblePasswords(prev => ({
       ...prev,
@@ -82,7 +39,9 @@ export function ClientManagement() {
     }));
   };
 
-  const renderPasswordField = (clientId: number, password: string, field: string) => {
+  const renderPasswordField = (clientId: string, password: string | null, field: string) => {
+    if (!password) return <span className="text-sm text-muted-foreground">-</span>;
+    
     const key = `${clientId}-${field}`;
     const isVisible = visiblePasswords[key];
     
@@ -103,6 +62,34 @@ export function ClientManagement() {
     );
   };
 
+  const getStatusBadgeColor = (status: string) => {
+    switch (status) {
+      case 'Actif': return 'bg-green-100 text-green-800';
+      case 'Inactif': return 'bg-gray-100 text-gray-800';
+      case 'Suspendu': return 'bg-red-100 text-red-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  const getTypeBadgeColor = (type: string) => {
+    switch (type) {
+      case 'SARL': return 'bg-blue-100 text-blue-800';
+      case 'SA': return 'bg-purple-100 text-purple-800';
+      case 'Auto-entrepreneur': return 'bg-orange-100 text-orange-800';
+      case 'Particulier': return 'bg-green-100 text-green-800';
+      case 'Association': return 'bg-yellow-100 text-yellow-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -112,10 +99,7 @@ export function ClientManagement() {
             Gérez vos clients et leurs informations
           </p>
         </div>
-        <Button className="gap-2">
-          <Plus className="h-4 w-4" />
-          Nouveau Client
-        </Button>
+        <ClientDialog onSubmit={createClient} isLoading={isCreating} />
       </div>
 
       <Card className="p-6">
@@ -135,8 +119,8 @@ export function ClientManagement() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Nom</TableHead>
-                <TableHead>Société</TableHead>
+                <TableHead>Nom Commercial</TableHead>
+                <TableHead>Raison Sociale</TableHead>
                 <TableHead>Contact</TableHead>
                 <TableHead>Type</TableHead>
                 <TableHead>Statut</TableHead>
@@ -148,43 +132,43 @@ export function ClientManagement() {
             <TableBody>
               {filteredClients.map((client) => (
                 <TableRow key={client.id}>
-                  <TableCell className="font-medium">{client.name}</TableCell>
-                  <TableCell>{client.company}</TableCell>
+                  <TableCell className="font-medium">{client.nom_commercial}</TableCell>
+                  <TableCell>{client.raison_sociale || '-'}</TableCell>
                   <TableCell>
                     <div className="space-y-1">
-                      <div className="flex items-center gap-1 text-sm">
-                        <Mail className="h-3 w-3" />
-                        {client.email}
-                      </div>
-                      <div className="flex items-center gap-1 text-sm">
-                        <Phone className="h-3 w-3" />
-                        {client.phone}
-                      </div>
+                      {client.email && (
+                        <div className="flex items-center gap-1 text-sm">
+                          <Mail className="h-3 w-3" />
+                          {client.email}
+                        </div>
+                      )}
+                      {client.telephone && (
+                        <div className="flex items-center gap-1 text-sm">
+                          <Phone className="h-3 w-3" />
+                          {client.telephone}
+                        </div>
+                      )}
                     </div>
                   </TableCell>
                   <TableCell>
-                    <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">
-                      {client.type}
+                    <span className={`px-2 py-1 rounded-full text-xs ${getTypeBadgeColor(client.type_client)}`}>
+                      {client.type_client}
                     </span>
                   </TableCell>
                   <TableCell>
-                    <span className={`px-2 py-1 rounded-full text-xs ${
-                      client.status === 'Actif' 
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-yellow-100 text-yellow-800'
-                    }`}>
-                      {client.status}
+                    <span className={`px-2 py-1 rounded-full text-xs ${getStatusBadgeColor(client.statut)}`}>
+                      {client.statut}
                     </span>
                   </TableCell>
                   <TableCell>
                     <div className="space-y-2 min-w-[150px]">
                       <div>
                         <div className="text-xs text-muted-foreground mb-1">Login:</div>
-                        <div className="text-sm font-mono">{client.dgiLogin}</div>
+                        <div className="text-sm font-mono">{client.identifiant_dgi || '-'}</div>
                       </div>
                       <div>
                         <div className="text-xs text-muted-foreground mb-1">Mot de passe:</div>
-                        {renderPasswordField(client.id, client.dgiPassword, 'dgi')}
+                        {renderPasswordField(client.id, client.mot_de_passe_dgi, 'dgi')}
                       </div>
                     </div>
                   </TableCell>
@@ -192,26 +176,40 @@ export function ClientManagement() {
                     <div className="space-y-2 min-w-[150px]">
                       <div>
                         <div className="text-xs text-muted-foreground mb-1">Login:</div>
-                        <div className="text-sm font-mono">{client.damancomLogin}</div>
+                        <div className="text-sm font-mono">{client.identifiant_damancom || '-'}</div>
                       </div>
                       <div>
                         <div className="text-xs text-muted-foreground mb-1">Mot de passe:</div>
-                        {renderPasswordField(client.id, client.damancomPassword, 'damancom')}
+                        {renderPasswordField(client.id, client.mot_de_passe_damancom, 'damancom')}
                       </div>
                     </div>
                   </TableCell>
                   <TableCell>
                     <div className="flex gap-2">
-                      <Button variant="outline" size="sm">
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button variant="outline" size="sm">
+                      <ClientDialog 
+                        client={client} 
+                        onSubmit={updateClient} 
+                        isLoading={isUpdating}
+                      />
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => deleteClient(client.id)}
+                        disabled={isDeleting}
+                      >
                         <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>
                   </TableCell>
                 </TableRow>
               ))}
+              {filteredClients.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
+                    Aucun client trouvé
+                  </TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </div>
